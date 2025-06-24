@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Carrito de Comprass</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    h1 { margin-bottom: 5px; }
+    .product { border: 1px solid #ccc; padding: 10px; margin: 10px; display: inline-block; width: 180px; vertical-align: top; text-align: center; }
+    .product img { width: 100px; height: 100px; transition: transform 0.3s; }
+    .product img:hover { transform: scale(1.8); }
+    #cart-count { font-weight: bold; background: red; color: white; border-radius: 50%; padding: 5px 10px; margin-left: 10px; }
+    #cart-icon { font-size: 24px; }
+    .cart-item { margin: 5px 0; }
+  </style>
+</head>
+<body>
+
+  <h1>Tienda Loca</h1>
+  <div>
+    <span id="cart-icon">🛒</span><span id="cart-count">0</span>
+  </div>
+
+  <div id="products">
+    <!-- Productos -->
+    <script>
+      const productos = [
+  { nombre: "Camisa", precio: 20, imagen: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=100&q=80" },
+  { nombre: "Pantalón", precio: 40, imagen: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?auto=format&fit=crop&w=100&q=80" },
+  { nombre: "Zapatos", precio: 60, imagen: "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=100&q=80" },
+  { nombre: "Gorra", precio: 15, imagen: "https://cdn.pixabay.com/photo/2022/06/22/16/00/cap-7278216_1280.jpg" },
+  { nombre: "Bufanda", precio: 10, imagen: "https://cdn.pixabay.com/photo/2016/11/29/09/32/adult-1868750_1280.jpg" },
+  { nombre: "Remera", precio: 25, imagen: "https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=100&q=80" },
+  { nombre: "Zapatillas", precio: 55, imagen: "https://images.unsplash.com/photo-1517260911205-8e552e3e3f86?auto=format&fit=crop&w=100&q=80" },
+  { nombre: "Short", precio: 30, imagen: "https://cdn.pixabay.com/photo/2016/03/23/18/25/shorts-1273080_1280.jpg" },
+  { nombre: "Jacket", precio: 80, imagen: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=100&q=80" },
+  { nombre: "Medias", precio: 5, imagen: "https://cdn.pixabay.com/photo/2016/11/29/09/16/feet-1867462_1280.jpg" }
+];
+    </script>
+  </div>
+
+  <button id="addToCartBtn">Agrega al carrito</button>
+
+  <h2>Carrito de Compras</h2>
+  <div id="cart"></div>
+
+  <button id="checkoutBtn" disabled>Paga ahora</button>
+
+  <script>
+    const productsDiv = document.getElementById('products');
+    const cartDiv = document.getElementById('cart');
+    const checkoutBtn = document.getElementById('checkoutBtn');
+    const addToCartBtn = document.getElementById('addToCartBtn');
+    const cartCount = document.getElementById('cart-count');
+
+    let cartItems = [];
+    let totalProductos = 0;
+
+    productos.forEach((p, index) => {
+      const div = document.createElement('div');
+      div.className = 'product';
+      div.innerHTML = `
+        <img src="${p.imagen}" alt="${p.nombre}" />
+        <p>${p.nombre} - $${p.precio}</p>
+        <input type="checkbox" id="product${index}" data-index="${index}" />
+        <input type="number" id="qty${index}" value="1" min="1" disabled />
+      `;
+      productsDiv.appendChild(div);
+
+      // Habilitar cantidad al hacer check
+      setTimeout(() => {
+        const checkbox = document.getElementById(`product${index}`);
+        const qty = document.getElementById(`qty${index}`);
+        checkbox.addEventListener('change', () => {
+          qty.disabled = !checkbox.checked;
+        });
+      }, 10);
+    });
+
+    addToCartBtn.addEventListener('click', () => {
+      cartDiv.innerHTML = '';
+      cartItems = [];
+      totalProductos = 0;
+
+      let seleccionados = 0;
+
+      productos.forEach((p, index) => {
+        const checkbox = document.getElementById(`product${index}`);
+        const qty = document.getElementById(`qty${index}`);
+
+        if (checkbox && checkbox.checked) {
+          seleccionados++;
+
+          const cantidad = Number(qty.value);
+          if (cantidad < 1) {
+            alert("Cantidad invalida");
+          }
+
+          // ✅ Solo los 2 primeros productos se agregan bien
+          if (index < 2) {
+            cartItems.push({ nombre: p.nombre, precio: p.precio, cantidad });
+            const item = document.createElement('div');
+            item.className = 'cart-item';
+            item.textContent = `${p.nombre} x${cantidad} = $${p.precio * cantidad}`;
+            cartDiv.appendChild(item);
+            totalProductos += cantidad;
+          } else {
+            // ❌ Bug intencional: productos no se agregan o dan error silencioso
+            // cartItems.push({ nombre: p.nombre, precio: p.precio, cantidad: 0 });
+          }
+        }
+      });
+
+      if (seleccionados < 2) {
+        alert("Debes seleccionar almenos dos productos");
+        return;
+      }
+
+      cartCount.textContent = totalProductos;
+      checkoutBtn.disabled = false;
+    });
+
+    checkoutBtn.addEventListener('click', () => {
+      alert("Procesando pago...");
+      window.location.href = "http://loginhotmail.com"; // redirige a login raro
+    });
+  </script>
+
+</body>
+</html>
